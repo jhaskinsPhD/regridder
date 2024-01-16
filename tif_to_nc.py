@@ -149,10 +149,10 @@ def convert_to_geochem_nc(tif_file_path, nc_output_path, template_ds):
     
 def main():
     #define file paths
-    mask_5070 = r'/uufs/chpc.utah.edu/common/home/haskins-group1/users/tclark/regrid_practice/Proposed_method_test/mask_5070.tif'
-    mask_4326 = r'/uufs/chpc.utah.edu/common/home/haskins-group1/users/tclark/regrid_practice/Proposed_method_test/mask_4326.tif'
-    mask_4326_lowres = r'/uufs/chpc.utah.edu/common/home/haskins-group1/users/tclark/regrid_practice/Proposed_method_test/mask_4326_lowres.tif'
-    f_plya_nc = r'/uufs/chpc.utah.edu/common/home/haskins-group1/users/tclark/regrid_practice/Proposed_method_test/us_f_plya.nc'
+    mask_5070 = r'/uufs/chpc.utah.edu/common/home/u1285966/Haskins/tclark/tif_to_nc_output/mask_5070.tif'
+    mask_4326 = r'/uufs/chpc.utah.edu/common/home/u1285966/Haskins/tclark/tif_to_nc_output/mask_4326.tif'
+    mask_4326_lowres = r'/uufs/chpc.utah.edu/common/home/u1285966/Haskins/tclark/tif_to_nc_output/mask_4326_lowres.tif'
+    f_plya_nc = r'/uufs/chpc.utah.edu/common/home/u1285966/Haskins/tclark/tif_to_nc_output/us_f_plya.nc'
     tif_5070_path = r'/uufs/chpc.utah.edu/common/home/haskins-group1/users/tclark/gssurgo_tiff_data/us.tif'
     
     #define template file
