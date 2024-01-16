@@ -156,7 +156,7 @@ def main():
     tif_5070_path = r'/uufs/chpc.utah.edu/common/home/haskins-group1/users/tclark/gssurgo_tiff_data/us.tif'
     
     #define template file
-    template_file = '/uufs/chpc.utah.edu/common/home/haskins-group1/users/tclark/dust_emissions_05.20210906.nc'
+    template_file = r'gssurgo-for-geos-chem/template_files/dust_emissions_05.20210906.nc'
     template_ds=xr.open_dataset(template_file)
     
     #run methods
