@@ -68,8 +68,8 @@ def _convert_to_geochem_nc(tif_file_path:str, nc_output_path:str, template_ds:xr
         template_ds (xr.array): an xarry object that represents a geo-chem compatible netcdf file
         sum_or_average (str, optional): determines wether the resulting netcdf file should be regridded based on a sum or average of the input data if input is True output will regrid based on sum if it is False the regridder will regrid based on average resampling w. Defaults to True.
     """
-    if (resampling_method != "sum" or resampling_method != "average"):
-        raise Exception("resampling_method must be a string representing either 'sum' or 'average' ")
+    if (resampling_method != "sum" and resampling_method != "average"):
+        raise Exception("resampling_method must be a string representing either 'sum' or 'average' and it is ", resampling_method)
 
     #open file as xarray object using rioxarray
     input_ds = rioxarray.open_rasterio(tif_file_path)
@@ -86,11 +86,12 @@ def _convert_to_geochem_nc(tif_file_path:str, nc_output_path:str, template_ds:xr
     
     #create regrid object
     regridder = xe.Regridder(input_ds, template_ds, "conservative")
+    # suggested method to fix Latitude outside of [-90,90] can be found @ https://stackoverflow.com/questions/66177931/how-do-i-resample-a-high-resolution-grib-grid-to-a-coarser-resolution-using-xesm
     
     #regrid xarray object
     regrided_ds = regridder(input_ds) 
     
-    if (sum_instead_of_average):
+    if (resampling_method == 'sum'):
         # Converting to sum like this only works because the input data is in kg on a 1 km^2 grid.
         # Because of this, when the average is taken it effectively gives the average units of kg/km^2.
         # All that needs to be done to convert from kg/km^2 to kg is to multiply each cell by its area.
@@ -119,7 +120,7 @@ def tif_5070_to_gc_netcdf(fulrez_4326_path:str, lowrez_4326_path:str, output_nc_
 
     #open template
     template_ds=xr.open_dataset(template_path)
-    print(f"dsgdfgsdfgdsgdg{template_ds}")
+    print(f"{template_ds}")
     
     #run methods
     _transform_5070_to_4326(tif_5070_path, fulrez_4326_path)
