@@ -59,7 +59,7 @@ def _transform_5070_to_4326(tif_path_5070:str, tif_path_4326:str):
     gdal.Warp(tif_path_4326, input_ds, options = options) # goes from srcSRS to dstSRS
     input_ds = None #close the data set
 
-def _convert_to_geochem_nc(tif_file_path:str, nc_output_path:str, template_ds:xr.DataArray, sum_instead_of_average:bool = True):
+def _convert_to_geochem_nc(tif_file_path:str, nc_output_path:str, template_ds:xr.DataArray, resampling_method):
     """creates a netcdf file from a tiff input file that is gridded in a lat/lon format
 
     Args:
@@ -68,6 +68,8 @@ def _convert_to_geochem_nc(tif_file_path:str, nc_output_path:str, template_ds:xr
         template_ds (xr.array): an xarry object that represents a geo-chem compatible netcdf file
         sum_or_average (str, optional): determines wether the resulting netcdf file should be regridded based on a sum or average of the input data if input is True output will regrid based on sum if it is False the regridder will regrid based on average resampling w. Defaults to True.
     """
+    if (resampling_method != "sum" or resampling_method != "average"):
+        raise Exception("resampling_method must be a string representing either 'sum' or 'average' ")
 
     #open file as xarray object using rioxarray
     input_ds = rioxarray.open_rasterio(tif_file_path)
@@ -96,7 +98,7 @@ def _convert_to_geochem_nc(tif_file_path:str, nc_output_path:str, template_ds:xr
     
     regrided_ds.to_netcdf(nc_output_path)
         
-def tif_5070_to_gc_netcdf(fulrez_4326_path:str, lowrez_4326_path:str, output_nc_path:str, tif_5070_path:str,  template_path:str, scaling_factor:float = 0.1):
+def tif_5070_to_gc_netcdf(fulrez_4326_path:str, lowrez_4326_path:str, output_nc_path:str, tif_5070_path:str,  template_path:str, resampling_method = "average", scaling_factor:float = 0.1):
     """
     Converts a TIFF file to a NetCDF file using a given template.
 
@@ -117,11 +119,12 @@ def tif_5070_to_gc_netcdf(fulrez_4326_path:str, lowrez_4326_path:str, output_nc_
 
     #open template
     template_ds=xr.open_dataset(template_path)
+    print(f"dsgdfgsdfgdsgdg{template_ds}")
     
     #run methods
     _transform_5070_to_4326(tif_5070_path, fulrez_4326_path)
     _rescale_resolution(fulrez_4326_path, lowrez_4326_path, scaling_factor)
-    _convert_to_geochem_nc(lowrez_4326_path, output_nc_path, template_ds)
+    _convert_to_geochem_nc(lowrez_4326_path, output_nc_path, template_ds, resampling_method = resampling_method)
 
 def create_mask_values_above(input_file:str, output_file:str, threshold:float):
     """
