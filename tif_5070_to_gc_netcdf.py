@@ -74,30 +74,33 @@ def _convert_to_geochem_nc(tif_file_path:str, nc_output_path:str, template_ds:xr
     #open file as xarray object using rioxarray
     input_ds = rioxarray.open_rasterio(tif_file_path)
     
-    #ensure there are no nan-values and replace all possible null values
-    input_ds = input_ds.where(input_ds != input_ds._FillValue, 0) #remove fill values
-    input_ds = input_ds.where(input_ds.notnull(),0) #remove Nan, None, or NaT
+    # I am using this with statement to try to ensure that rioxarray files are closed 
+    with rioxarray.open_rasterio(tif_file_path) as input_ds:
+        
+        # Ensure there are no nan-values and replace all possible null values
+        input_ds = input_ds.where(input_ds != input_ds._FillValue, 0) #remove fill values
+        input_ds = input_ds.where(input_ds.notnull(),0) #remove Nan, None, or NaT
+        
+        #convert to data set
+        input_ds = input_ds.to_dataset(name = "output")
     
-    #convert to data set
-    input_ds = input_ds.to_dataset(name = "output")
+        #rename axes so data will work with regridder
+        input_ds = input_ds.rename({'x':'lon','y':'lat'})
     
-    #rename axes so data will work with regridder
-    input_ds = input_ds.rename({'x':'lon','y':'lat'})
-    
-    #create regrid object
-    regridder = xe.Regridder(input_ds, template_ds, "conservative")
-    # suggested method to fix Latitude outside of [-90,90] can be found @ https://stackoverflow.com/questions/66177931/how-do-i-resample-a-high-resolution-grib-grid-to-a-coarser-resolution-using-xesm
-    
-    #regrid xarray object
-    regrided_ds = regridder(input_ds) 
-    
-    if (resampling_method == 'sum'):
-        # Converting to sum like this only works because the input data is in kg on a 1 km^2 grid.
-        # Because of this, when the average is taken it effectively gives the average units of kg/km^2.
-        # All that needs to be done to convert from kg/km^2 to kg is to multiply each cell by its area.
-        regrided_ds = regrided_ds * template_ds["AREA"] / 1e6 # the 1e6 is to convert from m^2 to km^2
-    
-    regrided_ds.to_netcdf(nc_output_path)
+        #create regrid object
+        regridder = xe.Regridder(input_ds, template_ds, "conservative")
+        # suggested method to fix Latitude outside of [-90,90] can be found @ https://stackoverflow.com/questions/66177931/how-do-i-resample-a-high-resolution-grib-grid-to-a-coarser-resolution-using-xesm
+            
+        #regrid xarray object
+        regrided_ds = regridder(input_ds) 
+        
+        if (resampling_method == 'sum'):
+            # Converting to sum like this only works because the input data is in kg on a 1 km^2 grid.
+            # Because of this, when the average is taken it effectively gives the average units of kg/km^2.
+            # All that needs to be done to convert from kg/km^2 to kg is to multiply each cell by its area.
+            regrided_ds = regrided_ds * template_ds["AREA"] / 1e6 # the 1e6 is to convert from m^2 to km^2
+        
+        regrided_ds.to_netcdf(nc_output_path)
         
 def tif_5070_to_gc_netcdf(fulrez_4326_path:str, lowrez_4326_path:str, output_nc_path:str, tif_5070_path:str,  template_path:str, resampling_method = "average", scaling_factor:float = 0.1):
     """
