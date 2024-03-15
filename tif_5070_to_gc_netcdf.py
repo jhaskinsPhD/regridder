@@ -28,7 +28,7 @@ def _rescale_resolution(input_file:str, output_file:str, scaling_factor:float):
         outputType = gdal.GDT_Float32, #outputType= gdal.GDT_Int64, this needs to be changed based on what is going to be done with the data for salt I am using a float because the data may have been fractionalized when being warped.
         width=new_width,
         height=new_height,
-        resampleAlg=gdal.GRA_Average,  # You can change the resampling method as needed
+        resampleAlg=gdal.GRA_Average,
     )
     
     #transfor,
@@ -46,7 +46,7 @@ def _transform_5070_to_4326(tif_path_5070:str, tif_path_4326:str):
     """
     input_ds = gdal.Open(tif_path_5070)
     
-        # set options
+    # set options
     options = gdal.WarpOptions(
         format="GTiff",
         outputType = gdal.GDT_Float32,
@@ -70,11 +70,8 @@ def _convert_to_geochem_nc(tif_file_path:str, nc_output_path:str, template_ds:xr
     """
     if (resampling_method != "sum" and resampling_method != "average"):
         raise Exception("resampling_method must be a string representing either 'sum' or 'average' and it is ", resampling_method)
-
-    #open file as xarray object using rioxarray
-    input_ds = rioxarray.open_rasterio(tif_file_path)
     
-    # I am using this with statement to try to ensure that rioxarray files are closed 
+    # I am using this with statement to try to ensure that rioxarray files are closed
     with rioxarray.open_rasterio(tif_file_path) as input_ds:
         
         # Ensure there are no nan-values and replace all possible null values
@@ -123,7 +120,6 @@ def tif_5070_to_gc_netcdf(fulrez_4326_path:str, lowrez_4326_path:str, output_nc_
 
     #open template
     template_ds=xr.open_dataset(template_path)
-    print(f"{template_ds}")
     
     #run methods
     _transform_5070_to_4326(tif_5070_path, fulrez_4326_path)
