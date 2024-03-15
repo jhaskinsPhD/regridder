@@ -7,4 +7,4 @@ input_tif_5070_path = r"examples/example_data/1992_salt_estimate.tif"
 template_path = r"examples/example_data/dust_emissions_05.20210906.nc"
 scaling_factor = 1
 
-tif_5070_to_gc_netcdf(fulrez_4326_path, lowrez_4326_path, output_nc_path, input_tif_5070_path, template_path, resampling_method= "sum", scaling_factor=scaling_factor)
+tif_to_nc(fulres_4326_path, lowres_4326_path, output_nc_path, input_tif_5070_path, template_path, scaling_factor=scaling_factor)
