@@ -15,6 +15,9 @@ import rasterio
 from rasterio.vrt import WarpedVRT
 import os
 
+# I MADE A CHANGE! 
+#and another! 
+
 def rescale_resolution(input_file, output_file, scaling_factor):
     '''
 
