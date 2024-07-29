@@ -17,6 +17,7 @@ import os
 
 # I MADE A CHANGE! 
 #and another! 
+<<<<<<< HEAD
 #another change! 
 #another change
 
